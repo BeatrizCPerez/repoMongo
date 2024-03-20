@@ -1,36 +1,48 @@
-import { DataTypes } from 'sequelize';
-import connection_db from '../database/connection_db.js'
+import mongoose from 'mongoose';
 
-
-const BicycleModel = connection_db.define('Bicycle', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-        unique: true, //nos permite filtrar para que los datos no se puedan duplicar
-    },
-    model: {
-        type: DataTypes.STRING(100),
-        allowNull: false
-    },
-    speeds: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    frame: {
-        type: DataTypes.STRING(100),
-        allowNull: false
-    },
-    electric: {
-        type: DataTypes.BOOLEAN,
-    },
-    image: {
-        type: DataTypes.STRING,
-        allowNull: false
-    } 
-}, {
-    tableName: 'bicycles', //Nombre de la tabla en la base de datos.
-    timestamps: false //Para deshabilitar los campos createdAt y updatedAt.
+const bicycleSchema = new mongoose.Schema({ 
+  model: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  speeds: {
+    type: Number,
+    required: true,
+  },
+  frame:{
+    type: String,
+    required: true,
+  },
+  electric:{
+    type: Boolean,
+    required: true,
+  },
+  image:{
+    type: String,
+    required: true,
+  }
 });
+
+
+
+const BicycleModel = mongoose.model('BicycleModel', bicycleSchema);
+
+// const newBicycle = new BicycleModel({
+//   model: "bubummmmmmmmmmmm",
+//   speeds: 5, // Since it's a number, provide it without quotes
+//   frame: "test",
+//   electric: true, // Since it's a boolean, provide it as true/false, not "1"
+//   image: "www.test.com"
+// });
+
+// // Guardar el nuevo bicicleta en la base de datos
+// newBicycle.save()
+//   .then((result) => {
+//     console.log('New bicycle saved successfully.', result);
+//   })
+//   .catch(error => {
+//     console.error('Error saving new bicycle:', error);
+//   });
 
 export default BicycleModel;

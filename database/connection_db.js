@@ -1,20 +1,16 @@
-import { Sequelize } from "sequelize";
-import {DB_DEV_NAME, DB_USER, DB_PASSWORD, DB_TEST_NAME, NODE_ENV} from '../config.js';
+import mongoose from "mongoose";
+import {DB_PASSWORD} from '../config.js';
 
-const DB_NAME = NODE_ENV === 'test' ? DB_TEST_NAME : DB_DEV_NAME; //Condición: Elige una bbdd u otra (la de bicicletas o la de test) "? equivale a if" y ": equivale a else"
+const connection_db = async () => {
+    try {
+        const connectionString = `mongodb+srv://cuentaclasef5:${DB_PASSWORD}@cluster0.nl9lbmh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-//La condición anterior equivale a esto:
-// if(NODE_ENV === 'test'){
-//     return DB_TEST_NAME;
-// }
-// else{
-//     DB_DEV_NAME
-// }
+        await mongoose.connect(connectionString);
+        console.log("Database connected");
+    } catch (error) {
+        console.error("Error connecting to database:", error);
+    }
+};
 
-// Crear conexión a la base de datos utilizando las variables de entorno
-const connection_db = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-    host: 'localhost',
-    dialect: "mysql"
-});
+export default connection_db;
 
-export default connection_db; 

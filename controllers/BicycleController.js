@@ -1,72 +1,84 @@
-// import { request, response } from 'express';
-import BicycleModel from '../models/BicycleModel.js'
+// controllers/BicycleController.js
+import BicycleModel from "../models/BicycleModel.js";
 
-export const getAllBicycles = async (request, response) => {
-    try {
-        const bicycles = await BicycleModel.findAll();
-        response.status(200).json(bicycles);
-    }
-    catch(error){
-        response.status(500).json({message: error.message})
-    }
-}
-export const deleteBicycle = async (request, response) => {
-        const {id} = request.params
-    try {
-        const bicycle = await BicycleModel.findByPk(id);
-        if (!bicycle) {
-            return response.status(404).json({ success: false, error: 'Bicicleta no encontrada' });
-          }
-            await bicycle.destroy();
-      
-          response.status(200).json({ success: true, message: 'Bicicleta eliminada con éxito' });
-        } catch (error) {
-          console.error('Error al eliminar bicicleta:', error);
-          response.status(500).json({ success: false, error: 'Error interno del servidor' });
-        }
-}
-export const createBicycle = async (request, response) => {
-    try {
-        // const{model,speed,frame,electric,image} = request.body;
-        const newBicycle = await BicycleModel.create(request.body);
-
-        response.status(201).json({ success: true, data: newBicycle, message: 'Bicicleta creada con éxito' });
-        } catch (error) {
-          console.error('Error al crear la bicicleta:', error);
-          response.status(500).json({ success: false, error: 'Error interno del servidor' });
-        }
-}
-
-
-export const updateBicycle = async (request, response) => {
-  const {id} = request.params;
-  const{model,speed,frame,electric,image} = request.body;
-
+export const getAllBicycles = async (req, res) => {
   try {
-    const bicycle = await BicycleModel.findByPk(id);
-    await bicycle.update({model,speed,frame,electric,image});
-
-    response.status(200).json({ success: true, data: bicycle, message: 'Bicicleta actualizada con éxito'});
-  
+    const bicycles = await BicycleModel.find();
+    res.status(200).json({ success: true, data: bicycles });
   } catch (error) {
-    console.error('Error al crear la bicicleta:', error);
-    response.status(500).json({ success: false, error: 'Error interno del servidor' });  
-  }
-}
-
-export const getOneBicycle = async (request, response) => {
-  const { id } = request.params;
-
-  try {
-    const bicycle = await BicycleModel.findByPk(id);
-
-    if (!bicycle) {
-      return response.status(404).json({ success: false, error: 'Bicicleta no encontrada' });
-    }
-
-    response.status(200).json({ success: true, data: bicycle });
-  } catch (error) {
-    console.error('Error al obtener la bicicleta:', error);
-    response.status(500).json({ success: false, error: 'Error interno del servidor' });
+    console.error('Error al obtener todas las bicicletas:', error);
+    res.status(500).json({ success: false, error: 'Error interno del servidor' });
   }
 };
+
+export const createBicycle = async (req, res) => {
+  try {
+    const { model, speeds, frame, electric, image } = req.body; // Corregir aquí
+    const newBicycle = await BicycleModel.create({ model, speeds, frame, electric, image }); // Corregir aquí
+    res.status(201).json({ success: true, data: newBicycle });
+  } catch (error) {
+    console.error('Error al agregar bicicleta:', error);
+    res.status(500).json({ success: false, error: 'Error interno del servidor' });
+  }
+};
+
+
+export const updateBicycle = async (req, res) => {
+  const { id } = req.params;
+
+  // Extraer solo los campos válidos que se pueden actualizar
+  const { model, speeds, frame, electric, image } = req.body;
+
+  try {
+    const updatedBicycle = await BicycleModel.findByIdAndUpdate(
+      id,
+      { model, speeds, frame, electric, image },
+      { new: true }
+    );
+
+    if (!updatedBicycle) {
+      return res.status(404).json({ success: false, message: 'Bicicleta no encontrada' });
+    }
+
+    res.status(200).json({ success: true, data: updatedBicycle });
+  } catch (error) {
+    console.error('Error al editar bicicleta:', error);
+    res.status(500).json({ success: false, message: 'Error al editar bicicleta' });
+  }
+};
+
+
+export const deleteBicycle = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedBicycle = await BicycleModel.findOneAndDelete({ _id: id });
+    if (!deletedBicycle) {
+      return res.status(404).json({ success: false, message: 'Bicicleta no encontrada' });
+    }
+    res.status(200).json({ success: true, message: 'Bicicleta eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar bicicleta:', error);
+    res.status(500).json({ success: false, message: 'Error al eliminar bicicleta' });
+  }
+};
+
+export const getOneBicycle = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const bicycle = await BicycleModel.findById(id);
+    if (!bicycle) {
+      return res.status(404).json({ success: false, error: 'Bicicleta no encontrada' });
+    }
+    res.status(200).json({ success: true, data: bicycle });
+  } catch (error) {
+    console.error('Error al obtener bicicleta:', error);
+    res.status(500).json({ success: false, error: 'Error interno del servidor' });
+  }
+};
+
+
+
+
+
